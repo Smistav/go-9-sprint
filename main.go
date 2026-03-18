@@ -44,7 +44,6 @@ func maximum(data []int) int {
 func maxChunks(data []int) int {
 	var (
 		wg sync.WaitGroup
-		mu sync.Mutex
 	)
 	if len(data) == 0 {
 		return 0
@@ -59,12 +58,10 @@ func maxChunks(data []int) int {
 			endIndex = len(data)
 		}
 		wg.Add(1)
-		go func() {
+		go func(idx, start, end int) {
 			defer wg.Done()
-			mu.Lock()
-			slice = append(slice, maximum(data[startIndex:endIndex]))
-			mu.Unlock()
-		}()
+			slice[idx] = maximum(data[start:end])
+		}(i, startIndex, endIndex)
 	}
 	wg.Wait()
 	return maximum(slice)
